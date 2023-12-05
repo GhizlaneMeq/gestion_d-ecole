@@ -43,3 +43,68 @@ function insert_Etudiant($level, $promotion, $utilisateur_id)
     return $etudiant_result;
 }
 
+
+function display()
+{
+    global $connect;
+
+    $query = "SELECT etudiants.id AS student_id, etudiants.level, etudiants.promotion,utilisateurs.image, utilisateurs.nom, utilisateurs.email, utilisateurs.phone, utilisateurs.genre
+    FROM etudiants
+    JOIN utilisateurs ON etudiants.utilisateur_id = utilisateurs.id;";
+    $stmt = mysqli_prepare($connect, $query);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return $result;
+}
+
+
+function delete($id)
+{
+    global $connect;
+    $requet = "DELETE FROM `etudiants` WHERE id=$id";
+    $result = mysqli_query($connect, $requet);
+
+    return $result;
+}
+
+
+
+function getInfos($id)
+{
+    global $connect;
+
+    $query = "SELECT etudiants.id AS student_id, etudiants.level, etudiants.promotion, utilisateurs.image, utilisateurs.nom, utilisateurs.email, utilisateurs.phone, utilisateurs.genre
+              FROM etudiants
+              JOIN utilisateurs ON etudiants.utilisateur_id = utilisateurs.id
+              WHERE etudiants.id = ?";
+    $stmt = mysqli_prepare($connect, $query);
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return ($result) ? mysqli_fetch_assoc($result) : null;
+}
+
+
+function update($id, $name, $email, $phone, $genre, $level, $promotion, $folder)
+{
+    global $connect;
+
+    $query = "UPDATE etudiants
+              JOIN utilisateurs ON etudiants.utilisateur_id = utilisateurs.id
+              SET
+                etudiants.level = ?,
+                etudiants.promotion = ?,
+                utilisateurs.image = ?,
+                utilisateurs.nom = ?,
+                utilisateurs.email = ?,
+                utilisateurs.phone = ?,
+                utilisateurs.genre = ?
+              WHERE
+                etudiants.id = ?";
+    $stmt = mysqli_prepare($connect, $query);
+    mysqli_stmt_bind_param($stmt, "sssssssi", $level, $promotion, $folder, $name, $email, $phone, $genre, $id);
+
+    return mysqli_stmt_execute($stmt);
+}

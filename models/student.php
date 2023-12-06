@@ -1,4 +1,6 @@
 <?php
+
+
 require_once __DIR__ . '/../config/connect.php';
 function insert($name, $email, $phone, $genre, $folder)
 {
@@ -17,17 +19,18 @@ function insert($name, $email, $phone, $genre, $folder)
     }
 
     $generatedPassword = generatePassword();
+    echo $generatedPassword;
     $hashedPassword = password_hash($generatedPassword, PASSWORD_DEFAULT);
     global $connect;
 
     $query = "INSERT INTO `utilisateurs`(`nom`, `email`, `phone`, `image`, `genre`, `role_id`, `password`) 
-              VALUES (?, ?, ?, ?, ?, 2, ?)";
+              VALUES (?, ?, ?, ?, ?, 3, ?)";
 
     $stmt = mysqli_prepare($connect, $query);
     mysqli_stmt_bind_param($stmt, "ssssss", $name, $email, $phone, $folder, $genre, $hashedPassword);
 
     $utilisateur_result = mysqli_stmt_execute($stmt);
-    return $utilisateur_result;
+    return [$utilisateur_result,$generatedPassword];
 }
 
 function insert_Etudiant($level, $promotion, $utilisateur_id)
@@ -108,3 +111,4 @@ function update($id, $name, $email, $phone, $genre, $level, $promotion, $folder)
 
     return mysqli_stmt_execute($stmt);
 }
+
